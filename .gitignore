@@ -19,3 +19,9 @@ Thumbs.db
 # Log files
 
 *.log
+
+part3/certs/*.key
+
+part3/certs/*.pem
+
+part3/certs/*.crt
