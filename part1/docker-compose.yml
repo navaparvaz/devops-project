@@ -1,0 +1,157 @@
+services:
+
+  postgres:
+
+    image: postgres:16-alpine
+
+    container_name: postgres
+
+    environment:
+
+      POSTGRES_DB: keycloak
+
+      POSTGRES_USER: keycloak
+
+      POSTGRES_PASSWORD: keycloak_pass
+
+    volumes:
+
+      - /opt/postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+
+      interval: 5s
+
+      timeout: 5s
+
+      retries: 5
+
+    mem_limit: 256m
+
+    logging:
+
+      driver: local
+
+      options:
+
+        max-size: "10m"
+
+        max-file: "20"
+
+
+
+  keycloak:
+
+    image: quay-mirror.liara.ir/keycloak/keycloak:26.0
+
+    container_name: keycloak
+
+    command: start-dev
+
+    environment:
+
+      KC_DB: postgres
+
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+
+      KC_DB_USERNAME: keycloak
+
+      KC_DB_PASSWORD: keycloak_pass
+
+      KEYCLOAK_ADMIN: admin
+
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      JAVA_OPTS_APPEND: "-Xms128m -Xmx512m -XX:MaxMetaspaceSize=256m"
+
+    ports:
+
+      - "8080:8080"
+
+    depends_on:
+
+      postgres:
+
+        condition: service_healthy
+
+    mem_limit: 1g
+
+    logging:
+
+      driver: local
+
+      options:
+
+        max-size: "10m"
+
+        max-file: "20"
+
+
+
+  curl:
+
+    image: curlimages/curl:latest
+
+    container_name: curl-service
+
+    command: sleep infinity
+
+    depends_on:
+
+      keycloak:
+
+        condition: service_started
+
+      postgres:
+
+        condition: service_started
+
+    mem_limit: 128m
+
+    logging:
+
+      driver: local
+
+      options:
+
+        max-size: "10m"
+
+        max-file: "20"
+
+
+
+  nginx:
+
+    image: nginx:alpine
+
+    container_name: nginx-proxy
+
+    ports:
+
+      - "80:80"
+
+    volumes:
+
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    depends_on:
+
+      keycloak:
+
+        condition: service_started
+
+    mem_limit: 128m
+
+    logging:
+
+      driver: local
+
+      options:
+
+        max-size: "10m"
+
+        max-file: "20"
+
+      

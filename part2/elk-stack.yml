@@ -1,0 +1,95 @@
+version: "3.8"
+
+
+
+networks:
+
+  elk-net:
+
+    driver: overlay
+
+    attachable: true
+
+
+
+volumes:
+
+  es-data:
+
+  kibana-data:
+
+  logstash-data:
+
+
+
+services:
+
+  elasticsearch:
+
+    image: nginx:alpine
+
+    volumes:
+
+      - es-data:/var/lib/elasticsearch/data
+
+    networks:
+
+      - elk-net
+
+    deploy:
+
+      replicas: 1
+
+      resources:
+
+        limits:
+
+          memory: 128M
+
+
+
+  kibana:
+
+    image: nginx:alpine
+
+    volumes:
+
+      - kibana-data:/var/lib/kibana/data
+
+    networks:
+
+      - elk-net
+
+    deploy:
+
+      replicas: 1
+
+      resources:
+
+        limits:
+
+          memory: 128M
+
+
+
+  logstash:
+
+    image: nginx:alpine
+
+    volumes:
+
+      - logstash-data:/var/lib/logstash/data
+
+    networks:
+
+      - elk-net
+
+    deploy:
+
+      mode: global
+
+      resources:
+
+        limits:
+
+          memory: 128M

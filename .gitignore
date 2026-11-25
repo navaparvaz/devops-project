@@ -1,0 +1,21 @@
+# SSL Certificates (Do not commit private keys!)
+
+certs/*.key
+
+certs/*.pem
+
+certs/*.crt
+
+
+
+# OS generated files
+
+.DS_Store
+
+Thumbs.db
+
+
+
+# Log files
+
+*.log
